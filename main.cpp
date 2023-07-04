@@ -47,8 +47,10 @@ int main() {
 
     Aws::S3::Model::PutObjectRequest putObjectRequest;
     // no set content type because it's json file
+
     putObjectRequest.SetBucket(bucketName.c_str());
     putObjectRequest.WithKey(fileName.c_str());
+    putObjectRequest.SetContentType("text/json");
 
     auto inputData = Aws::MakeShared<Aws::StringStream>(
             "PutObjectInputStream",

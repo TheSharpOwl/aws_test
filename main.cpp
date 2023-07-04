@@ -4,14 +4,20 @@
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/s3/S3Client.h>
 #include <aws/s3/model/PutObjectRequest.h>
+#include <aws/core/utils/memory/stl/AWSString.h>
+#include <aws/core/utils/logging/DefaultLogSystem.h>
+#include <aws/core/utils/logging/AWSLogging.h>
 #include <iostream>
 
 int main() {
+
     const char *rawJsonExample = "{\n}\n";
 
+    Aws::Utils::Logging::InitializeAWSLogging(
+            Aws::MakeShared<Aws::Utils::Logging::DefaultLogSystem>(
+                    "RunUnitTests", Aws::Utils::Logging::LogLevel::Trace, "aws_sdk_"));
     Aws::SDKOptions options;
     Aws::InitAPI(options);
-
     Aws::Client::ClientConfiguration clientConfig;
     clientConfig.endpointOverride = Aws::String("127.0.0.1:9000");
     clientConfig.scheme = Aws::Http::Scheme::HTTP;
@@ -72,5 +78,6 @@ int main() {
         std::cout << "PutObject error: " << result.GetError().GetExceptionName() << " " << result.GetError().GetMessage() << std::endl;
     }
 
+    Aws::Utils::Logging::ShutdownAWSLogging();
     return 0;
 }

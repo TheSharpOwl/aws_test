@@ -1,13 +1,13 @@
+#include "aws/s3/model/CreateBucketConfiguration.h"
+#include "aws/s3/model/CreateBucketRequest.h"
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/s3/S3Client.h>
 #include <aws/s3/model/PutObjectRequest.h>
-#include "aws/s3/model/CreateBucketConfiguration.h"
-#include "aws/s3/model/CreateBucketRequest.h"
 #include <iostream>
 
 int main() {
-    const char* rawJsonExample = "{\n}\n";
+    const char *rawJsonExample = "{\n}\n";
 
     Aws::SDKOptions options;
     Aws::InitAPI(options);
@@ -35,10 +35,8 @@ int main() {
     request.SetBucket(Aws::String(bucketName));
     auto outcome = client.CreateBucket(request);
 
-    if(!outcome.IsSuccess())
-    {
-        if(outcome.GetError().GetExceptionName() != "BucketAlreadyOwnedByYou")
-        {
+    if (!outcome.IsSuccess()) {
+        if (outcome.GetError().GetExceptionName() != "BucketAlreadyOwnedByYou") {
             std::cout << "FAILED TO CREATE A BUCKET\n";
             std::cout << outcome.GetError().GetExceptionName() << " " << outcome.GetError().GetMessage() << "\n";
             return -1;
@@ -52,12 +50,19 @@ int main() {
     putObjectRequest.WithKey(fileName.c_str());
     putObjectRequest.SetContentType("text/json");
 
+    // first way
     auto inputData = Aws::MakeShared<Aws::StringStream>(
             "PutObjectInputStream",
             fileName.c_str(),
             std::stringstream::in | std::stringstream::binary | std::stringstream::out);
 
     inputData->write(rawJsonExample, std::string(rawJsonExample).size());
+
+    // second way
+    //    const std::shared_ptr<Aws::IOStream> inputData =
+    //            Aws::MakeShared<Aws::StringStream>("");
+    //    *inputData << rawJsonExample;
+
 
     putObjectRequest.SetBody(inputData);
     auto result = client.PutObject(putObjectRequest);
